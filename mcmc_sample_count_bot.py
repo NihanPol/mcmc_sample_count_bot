@@ -95,3 +95,30 @@ for ii, ll in enumerate(lines):
     user_base_dir = np.append(user_base_dir, np.str(ubd + '/'))
 
 
+interval = 1 #hours
+channel = '#viper_mcmc_monitor' #channel to send messages to
+
+for un, ubd in zip(user_name, user_base_dir):
+    
+    chain_files = get_all_chain_files(np.str(ubd))
+    
+    updated_chain_files = np.array(())
+    
+    for path in chain_files:
+        if was_modified(path, time = interval * 3600):
+            updated_chain_files = np.append(updated_chain_files, path)
+    
+    if len(updated_chain_files) == 0:
+        msg = f'@{un} has no MCMC runs going that updated in the last {interval} hrs. :tada:'
+        slack_client.chat_postMessage(channel = channel, text = msg)
+    
+    else:
+        init_msg = f'@{un} has the following MCMC runs going:'
+        slack_client.chat_postMessage(channel = channel, text = init_msg)
+        
+        for ii, path in enumerate(updated_chain_files):
+            
+            nsamp = count_lines(path)
+            
+            msg = f'{path}: {nsamp}'
+            slack_client.chat_postMessage(channel = channel, text = msg)
