@@ -3,9 +3,9 @@ from dotenv import load_dotenv
 from pathlib import Path
 import time
 
-def was_modified(fname, time = 60 * 60):
+def was_modified(fname, interval = 60 * 60):
     """
-    Function to determine whether file was modified within the time given by "time_since"
+    Function to determine whether file was modified within the time given by "interval"
     
     Input
     -----
@@ -21,7 +21,7 @@ def was_modified(fname, time = 60 * 60):
     mod_time = statbuf.st_mtime
     current_time = time.time()
     
-    if np.abs(mod_time - current_time) <= time:
+    if np.abs(mod_time - current_time) <= interval:
         return True
     else:
         return False
@@ -85,7 +85,7 @@ with open(user_file, 'r') as ff:
     lines = ff.readlines()
 
 user_name = np.array(())
-user_base_dir = np.array(())
+user_base_dir = np.array((), dtype = np.str)
 
 for ii, ll in enumerate(lines):
     
