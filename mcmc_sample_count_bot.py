@@ -94,11 +94,22 @@ for ii, ll in enumerate(lines):
     user_name = np.append(user_name, ufn + ' ' + uln)
     user_base_dir = np.append(user_base_dir, ubd + '/')
 
+users = slack_client.users_list()['members']
 
+user_id = np.array(())
+
+for ii, name in enumerate(user_name):
+    
+    for kk, member in enumerate(users):
+        
+        if name == member['profile']['real_name']:
+            user_id = np.append(user_id, member['id'])
+            break
+            
 interval = 1 #hours
 channel = '#viper_mcmc_monitor' #channel to send messages to
 
-for un, ubd in zip(user_name, user_base_dir):
+for un, ubd in zip(user_id, user_base_dir):
     
     chain_files = get_all_chain_files(np.str(ubd))
     
@@ -109,11 +120,11 @@ for un, ubd in zip(user_name, user_base_dir):
             updated_chain_files = np.append(updated_chain_files, path)
     
     if len(updated_chain_files) == 0:
-        msg = f'@{un} has no MCMC runs going that updated in the last {interval} hrs. :tada:'
-        slack_client.chat_postMessage(channel = channel, text = msg)
+        msg = f'<@{un}> has no MCMC runs going that updated in the last {interval} hrs. :tada:'
+        slack_client.chat_postMessage(channel = channel, text = msg, link_names = 1)
     
     else:
-        init_msg = f'@{un} has the following MCMC runs going:'
+        init_msg = f'<@{un}> has the following MCMC runs going:'
         slack_client.chat_postMessage(channel = channel, text = init_msg)
         
         for ii, path in enumerate(updated_chain_files):
@@ -121,4 +132,4 @@ for un, ubd in zip(user_name, user_base_dir):
             nsamp = count_lines(path)
             
             msg = f'{path}: {nsamp}'
-            slack_client.chat_postMessage(channel = channel, text = msg)
+            slack_client.chat_postMessage(channel = channel, text = msg, link_names = 1)
