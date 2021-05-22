@@ -2,6 +2,18 @@ import slack, numpy as np, os, json
 from dotenv import load_dotenv
 from pathlib import Path
 import time
+import argparse
+
+parser = argparse.ArgumentParser(description = "Setup slackbot to report number of samples in runs")
+
+#Required arguments:
+parser.add_argument("-run_every", type = float, dest = 'run_every', required = True, help = "Run this code once per given number of hours")
+parser.add_argument("-channel", dest = 'channel', required = True, help = "Slack channel to send the message; App MUST BE ADDED TO CHANNEL")
+
+parser.add_argument("--interval", type = float, dest = 'interval', default = 1, help = "Check for chains updated in the last given number of hours")
+parser.add_argument("--user_file", default = "users.txt", help = "Text file containing user's full name and base directory; Format: first_name last_name base_dir")
+
+args = parser.parse_args()
 
 def was_modified(fname, interval = 60 * 60):
     """
@@ -78,7 +90,7 @@ slack_client = slack.WebClient(token = os.environ['SLACK_TOKEN'])
 BOT_ID = slack_client.api_call("auth.test")['user_id']
 
 #Read in the users for whom this bot should be run:
-user_file = "users.txt"
+user_file = args.user_file
 
 with open(user_file, 'r') as ff:
     
@@ -106,8 +118,8 @@ for ii, name in enumerate(user_name):
             user_id = np.append(user_id, member['id'])
             break
             
-interval = 1 #hours
-channel = '#viper_mcmc_monitor' #channel to send messages to
+interval = args.interval #hours
+channel = args.channel #channel to send messages to
 
 for un, ubd in zip(user_id, user_base_dir):
     
@@ -127,9 +139,14 @@ for un, ubd in zip(user_id, user_base_dir):
         init_msg = f'<@{un}> has the following MCMC runs going:'
         slack_client.chat_postMessage(channel = channel, text = init_msg)
         
+        msg = ''
+        
         for ii, path in enumerate(updated_chain_files):
             
             nsamp = count_lines(path)
             
-            msg = f'{path}: {nsamp}'
-            slack_client.chat_postMessage(channel = channel, text = msg, link_names = 1)
+            msg = msg + f'{path}: {nsamp} \n'
+            
+        slack_client.chat_postMessage(channel = channel, text = msg, link_names = 1)
+            
+            
