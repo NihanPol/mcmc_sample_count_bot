@@ -61,7 +61,7 @@ def get_all_chain_files(base_dir):
     chain_files: np.array; array containing paths to all chain_* files found.
     """
     
-    chain_files = np.array((), dtype = 'str')
+    chain_files = np.array((), dtype = np.str)
     
     for path, subdirs, files in os.walk(base_dir):
         
@@ -92,6 +92,6 @@ for ii, ll in enumerate(lines):
     un, ubd = ll.strip().split(' ')
     
     user_name = np.append(user_name, un)
-    user_base_dir = np.append(user_base_dir, ubd + '/')
+    user_base_dir = np.append(user_base_dir, np.str(ubd + '/'))
 
 
