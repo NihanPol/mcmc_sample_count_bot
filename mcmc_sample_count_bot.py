@@ -7,11 +7,11 @@ import argparse
 parser = argparse.ArgumentParser(description = "Setup slackbot to report number of samples in runs")
 
 #Required arguments:
-parser.add_argument("-run_every", type = float, dest = 'run_every', required = True, help = "Run this code once per given number of hours")
 parser.add_argument("-channel", dest = 'channel', required = True, help = "Slack channel to send the message; App MUST BE ADDED TO CHANNEL")
 
-parser.add_argument("--interval", type = float, dest = 'interval', default = 1, help = "Check for chains updated in the last given number of hours")
 parser.add_argument("--user_file", default = "users.txt", help = "Text file containing user's full name and base directory; Format: first_name last_name base_dir")
+parser.add_argument("-run_every", type = float, dest = 'run_every', default = 12, help = "Run this code once per given number of hours")
+parser.add_argument("--interval", type = float, dest = 'interval', default = 1, help = "Check for chains updated in the last given number of hours")
 
 args = parser.parse_args()
 
@@ -121,32 +121,34 @@ for ii, name in enumerate(user_name):
 interval = args.interval #hours
 channel = args.channel #channel to send messages to
 
-for un, ubd in zip(user_id, user_base_dir):
-    
-    chain_files = get_all_chain_files(np.str(ubd))
-    
-    updated_chain_files = np.array(())
-    
-    for path in chain_files:
-        if was_modified(path, interval = interval * 3600):
-            updated_chain_files = np.append(updated_chain_files, path)
-    
-    if len(updated_chain_files) == 0:
-        msg = f'<@{un}> has no MCMC runs going that updated in the last {interval} hrs. :tada:'
-        slack_client.chat_postMessage(channel = channel, text = msg, link_names = 1)
-    
-    else:
-        init_msg = f'<@{un}> has the following MCMC runs going:'
-        slack_client.chat_postMessage(channel = channel, text = init_msg)
-        
-        msg = ''
-        
-        for ii, path in enumerate(updated_chain_files):
+while True:
+
+    for un, ubd in zip(user_id, user_base_dir):
+
+        chain_files = get_all_chain_files(np.str(ubd))
+
+        updated_chain_files = np.array(())
+
+        for path in chain_files:
+            if was_modified(path, interval = interval * 3600):
+                updated_chain_files = np.append(updated_chain_files, path)
+
+        if len(updated_chain_files) == 0:
+            msg = f'<@{un}> has no MCMC runs going that updated in the last {interval} hrs. :tada:'
+            slack_client.chat_postMessage(channel = channel, text = msg, link_names = 1)
+
+        else:
+            init_msg = f'<@{un}> has the following MCMC runs going:'
+            slack_client.chat_postMessage(channel = channel, text = init_msg)
+
+            msg = ''
+
+            for ii, path in enumerate(updated_chain_files):
+
+                nsamp = count_lines(path)
+
+                msg = msg + f'{path}: {nsamp} \n'
+
+            slack_client.chat_postMessage(channel = channel, text = msg, link_names = 1)
             
-            nsamp = count_lines(path)
-            
-            msg = msg + f'{path}: {nsamp} \n'
-            
-        slack_client.chat_postMessage(channel = channel, text = msg, link_names = 1)
-            
-            
+    time.sleep(args.run_every * 3600)
