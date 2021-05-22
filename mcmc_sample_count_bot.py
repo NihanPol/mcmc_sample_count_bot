@@ -105,7 +105,7 @@ for un, ubd in zip(user_name, user_base_dir):
     updated_chain_files = np.array(())
     
     for path in chain_files:
-        if was_modified(path, time = interval * 3600):
+        if was_modified(path, interval = interval * 3600):
             updated_chain_files = np.append(updated_chain_files, path)
     
     if len(updated_chain_files) == 0:
