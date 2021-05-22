@@ -85,14 +85,14 @@ with open(user_file, 'r') as ff:
     lines = ff.readlines()
 
 user_name = np.array(())
-user_base_dir = np.array((), dtype = np.str)
+user_base_dir = np.array(())
 
 for ii, ll in enumerate(lines):
     
-    un, ubd = ll.strip().split(' ')
+    ufn, uln, ubd = ll.strip().split(' ')
     
-    user_name = np.append(user_name, un)
-    user_base_dir = np.append(user_base_dir, np.str(ubd + '/'))
+    user_name = np.append(user_name, ufn + ' ' + uln)
+    user_base_dir = np.append(user_base_dir, ubd + '/')
 
 
 interval = 1 #hours
