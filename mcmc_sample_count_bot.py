@@ -12,6 +12,7 @@ parser.add_argument("-channel", dest = 'channel', required = True, help = "Slack
 parser.add_argument("--user_file", default = "users.txt", help = "Text file containing user's full name and base directory; Format: first_name last_name base_dir")
 parser.add_argument("-run_every", type = float, dest = 'run_every', default = 12, help = "Run this code once per given number of hours")
 parser.add_argument("--interval", type = float, dest = 'interval', default = 1, help = "Check for chains updated in the last given number of hours")
+parser.add_argument("--cronjob", dest = 'cronjob', action = 'store_true', default = False, help = 'Flag to set whether bot is run as a Slurm/PBS job or cron job. Default: False')
 
 args = parser.parse_args()
 
@@ -121,8 +122,8 @@ for ii, name in enumerate(user_name):
 interval = args.interval #hours
 channel = args.channel #channel to send messages to
 
-while True:
-
+if args.cronjob:
+    
     for un, ubd in zip(user_id, user_base_dir):
 
         chain_files = get_all_chain_files(np.str(ubd))
@@ -134,11 +135,11 @@ while True:
                 updated_chain_files = np.append(updated_chain_files, path)
 
         if len(updated_chain_files) == 0:
-            msg = f'<@{un}> has no MCMC runs going that updated in the last {interval} hrs. :tada:'
+            msg = f':robot_face: <@{un}> has no MCMC runs going that updated in the last {interval} hrs. :tada:'
             slack_client.chat_postMessage(channel = channel, text = msg, link_names = 1)
 
         else:
-            init_msg = f'<@{un}> has the following MCMC runs going:'
+            init_msg = f':robot_face: <@{un}> has the following MCMC runs going:'
             slack_client.chat_postMessage(channel = channel, text = init_msg)
 
             msg = ''
@@ -148,7 +149,58 @@ while True:
                 nsamp = count_lines(path)
 
                 msg = msg + f'{path}: {nsamp} \n'
-
-            slack_client.chat_postMessage(channel = channel, text = msg, link_names = 1)
+                
+            block = {
+            'type': 'section',
+            'text': {
+            'type': 'mrkdwn',
+            'text': msg
+            }   
+            }
             
+            slack_client.chat_postMessage(channel = channel, blocks = block, link_names = 1)
+
     time.sleep(args.run_every * 3600)
+    
+else:
+
+    while True:
+
+        for un, ubd in zip(user_id, user_base_dir):
+
+            chain_files = get_all_chain_files(np.str(ubd))
+
+            updated_chain_files = np.array(())
+
+            for path in chain_files:
+                if was_modified(path, interval = interval * 3600):
+                    updated_chain_files = np.append(updated_chain_files, path)
+
+            if len(updated_chain_files) == 0:
+                msg = f':robot_face: <@{un}> has no MCMC runs going that updated in the last {interval} hrs. :tada:'
+                slack_client.chat_postMessage(channel = channel, text = msg, link_names = 1)
+
+            else:
+                init_msg = f':robot_face: <@{un}> has the following MCMC runs going:'
+                slack_client.chat_postMessage(channel = channel, text = init_msg)
+
+                msg = ''
+
+                for ii, path in enumerate(updated_chain_files):
+
+                    nsamp = count_lines(path)
+
+                    msg = msg + f'{path}: {nsamp} \n'
+                    
+                block = {
+                'type': 'section',
+                'text': {
+                'type': 'mrkdwn',
+                'text': msg
+                }   
+                }
+
+                slack_client.chat_postMessage(channel = channel, blocks = block, link_names = 1)
+                #slack_client.chat_postMessage(channel = channel, text = msg, link_names = 1)
+
+        time.sleep(args.run_every * 3600)
