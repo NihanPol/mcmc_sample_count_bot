@@ -136,7 +136,7 @@ if args.cronjob:
                 updated_chain_files = np.append(updated_chain_files, path)
 
         if len(updated_chain_files) == 0:
-            msg = f':robot_face: <@{un}> has no MCMC runs going that updated in the last {interval} hrs. :tada:'
+            msg = f':robot_face: <@{un}> has no MCMC runs going that updated in the last {interval} hrs. :crying_cat_face:'
             slack_client.chat_postMessage(channel = channel, text = msg, link_names = 1)
 
         else:
@@ -173,7 +173,7 @@ else:
                     updated_chain_files = np.append(updated_chain_files, path)
 
             if len(updated_chain_files) == 0:
-                msg = f':robot_face: <@{un}> has no MCMC runs going that updated in the last {interval} hrs. :tada:'
+                msg = f':robot_face: <@{un}> has no MCMC runs going that updated in the last {interval} hrs. :crying_cat_face:'
                 slack_client.chat_postMessage(channel = channel, text = msg, link_names = 1)
 
             else:
