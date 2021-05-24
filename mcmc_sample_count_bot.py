@@ -150,7 +150,7 @@ if args.cronjob:
                 fdata = pd.read_csv(path, sep='\t', dtype=float, header=None).values
 
                 nsamp = fdata.shape[0]
-                ac_rate = np.mean(fdata[:, -2])
+                ac_rate = np.round(np.mean(fdata[:, -2]), 3)
 
                 msg = msg + f'{path}: samples: {nsamp}; mean acceptance rate: {ac_rate} \n'
                 
@@ -189,7 +189,7 @@ else:
                     fdata = pd.read_csv(path, sep='\t', dtype=float, header=None).values
                     
                     nsamp = fdata.shape[0]
-                    ac_rate = np.mean(fdata[:, -2])
+                    ac_rate = np.round(np.mean(fdata[:, -2]), 3)
                     
                     msg = msg + f'{path}: samples: {nsamp}; mean acceptance rate: {ac_rate} \n'
                     
