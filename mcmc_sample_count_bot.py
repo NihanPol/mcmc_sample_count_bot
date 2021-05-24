@@ -10,9 +10,10 @@ parser = argparse.ArgumentParser(description = "Setup slackbot to report number 
 parser.add_argument("-channel", dest = 'channel', required = True, help = "Slack channel to send the message; App MUST BE ADDED TO CHANNEL")
 
 parser.add_argument("--user_file", default = "users.txt", help = "Text file containing user's full name and base directory; Format: first_name last_name base_dir")
-parser.add_argument("-run_every", type = float, dest = 'run_every', default = 12, help = "Run this code once per given number of hours")
+parser.add_argument("--run_every", type = float, dest = 'run_every', default = 12, help = "Run this code once per given number of hours")
 parser.add_argument("--interval", type = float, dest = 'interval', default = 1, help = "Check for chains updated in the last given number of hours")
 parser.add_argument("--cronjob", dest = 'cronjob', action = 'store_true', default = False, help = 'Flag to set whether bot is run as a Slurm/PBS job or cron job. Default: False')
+parser.add_argument("--test", dest = 'test', action = 'store_true', default = False, help = 'Flag to do a single test run of script and exit out of while loop.')
 
 args = parser.parse_args()
 
@@ -202,5 +203,8 @@ else:
 
                 slack_client.chat_postMessage(channel = channel, blocks = block, link_names = 1)
                 #slack_client.chat_postMessage(channel = channel, text = msg, link_names = 1)
-
+                
+        if args.test:
+            break
+                
         time.sleep(args.run_every * 3600)
