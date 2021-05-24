@@ -147,9 +147,12 @@ if args.cronjob:
 
             for ii, path in enumerate(updated_chain_files):
 
-                nsamp = count_lines(path)
+                fdata = pd.read_csv(path, sep='\t', dtype=float, header=None).values
 
-                msg = msg + f'{path}: {nsamp} \n'
+                nsamp = fdata.shape[0]
+                ac_rate = np.mean(fdata[:, -2])
+
+                msg = msg + f'{path}: samples: {nsamp}; mean acceptance rate: {ac_rate} \n'
                 
             block = {
             'type': 'section',
@@ -189,9 +192,14 @@ else:
 
                 for ii, path in enumerate(updated_chain_files):
 
-                    nsamp = count_lines(path)
-
-                    msg = msg + f'{path}: {nsamp} \n'
+                    #nsamp = count_lines(path)
+                    
+                    fdata = pd.read_csv(path, sep='\t', dtype=float, header=None).values
+                    
+                    nsamp = fdata.shape[0]
+                    ac_rate = np.mean(fdata[:, -2])
+                    
+                    msg = msg + f'{path}: samples: {nsamp}; mean acceptance rate: {ac_rate} \n'
                     
                 block = {
                 'type': 'section',
