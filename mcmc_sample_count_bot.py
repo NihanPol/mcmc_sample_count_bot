@@ -201,14 +201,22 @@ else:
                     
                     msg = msg + f'{path}: samples: {nsamp}; mean acceptance rate: {ac_rate} \n'
                     
-                block = {
+                """block = {
                 'type': 'section',
                 'text': {
                 'type': 'mrkdwn',
                 'text': msg
                 }   
+                }"""
+                
+                block = {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": msg
+                  }
                 }
-
+                
                 slack_client.chat_postMessage(channel = channel, blocks = block, link_names = 1)
                 #slack_client.chat_postMessage(channel = channel, text = msg, link_names = 1)
                 
