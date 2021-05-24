@@ -1,4 +1,4 @@
-import slack, numpy as np, os, json
+import slack, numpy as np, os, json, pandas as pd
 from dotenv import load_dotenv
 from pathlib import Path
 import time
