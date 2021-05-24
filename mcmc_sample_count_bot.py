@@ -152,7 +152,7 @@ if args.cronjob:
                 nsamp = fdata.shape[0]
                 ac_rate = np.round(np.mean(fdata[:, -2]), 3)
 
-                msg = msg + f'{path}: samples: {nsamp}; mean acceptance rate: {ac_rate} \n'
+                msg = msg + f'{path}: :chart_with_upwards_trend: samples: {nsamp}; :accept: avg. acpt rate: {ac_rate} \n'
                 
             slack_client.chat_postMessage(channel = channel, text = msg, mrkdwn = True, link_names = 1)
 
@@ -191,7 +191,7 @@ else:
                     nsamp = fdata.shape[0]
                     ac_rate = np.round(np.mean(fdata[:, -2]), 3)
                     
-                    msg = msg + f'{path}: samples: {nsamp}; mean acceptance rate: {ac_rate} \n'
+                    msg = msg + f'{path}: :chart_with_upwards_trend: samples: {nsamp}; :accept: avg. acpt rate: {ac_rate} \n'
                     
                 slack_client.chat_postMessage(channel = channel, text = msg, mrkdwn = True, link_names = 1)
                 
