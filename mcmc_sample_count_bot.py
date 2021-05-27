@@ -140,19 +140,27 @@ if args.cronjob:
             slack_client.chat_postMessage(channel = channel, text = msg, link_names = 1)
 
         else:
+            nsamp = []
+            ac_rate = []
+            for ii, path in enumerate(updated_chain_files):
+
+                #nsamp = count_lines(path)
+
+                fdata = pd.read_csv(path, sep='\t', dtype=float, header=None).values
+
+                nsamp.append(fdata.shape[0])
+                ac_rate.append(np.round(np.mean(fdata[:, -2]), 3))
+
+            # WGL moved this block down from line below else statement
+            # WGL now message after data extracted
             init_msg = f':robot_face: <@{un}> has the following MCMC runs going:'
             slack_client.chat_postMessage(channel = channel, text = init_msg)
 
             msg = ''
 
-            for ii, path in enumerate(updated_chain_files):
-
-                fdata = pd.read_csv(path, sep='\t', dtype=float, header=None).values
-
-                nsamp = fdata.shape[0]
-                ac_rate = np.round(np.mean(fdata[:, -2]), 3)
-
-                msg = msg + f'{path}: :chart_with_upwards_trend: samples: {nsamp}; :accept: avg. acpt rate: {ac_rate} \n'
+            # WGL adding this loop to send messages
+            for acr, n in zip(ac_rate, nsamp):
+                msg = msg + f'{path}: :chart_with_upwards_trend: samples: {n}; :accept: avg. acpt rate: {acr} \n'
                 
             slack_client.chat_postMessage(channel = channel, text = msg, mrkdwn = True, link_names = 1)
 
@@ -177,21 +185,27 @@ else:
                 slack_client.chat_postMessage(channel = channel, text = msg, link_names = 1)
 
             else:
-                init_msg = f':robot_face: <@{un}> has the following MCMC runs going:'
-                slack_client.chat_postMessage(channel = channel, text = init_msg)
-
-                msg = ''
-
+                nsamp = []
+                ac_rate = []
                 for ii, path in enumerate(updated_chain_files):
 
                     #nsamp = count_lines(path)
                     
                     fdata = pd.read_csv(path, sep='\t', dtype=float, header=None).values
                     
-                    nsamp = fdata.shape[0]
-                    ac_rate = np.round(np.mean(fdata[:, -2]), 3)
-                    
-                    msg = msg + f'{path}: :chart_with_upwards_trend: samples: {nsamp}; :accept: avg. acpt rate: {ac_rate} \n'
+                    nsamp.append(fdata.shape[0])
+                    ac_rate.append(np.round(np.mean(fdata[:, -2]), 3))
+                 
+                # WGL moved this block down from line below else statement
+                # WGL now message after data extracted
+                init_msg = f':robot_face: <@{un}> has the following MCMC runs going:'
+                slack_client.chat_postMessage(channel = channel, text = init_msg)
+
+                msg = ''
+                
+                # WGL adding this loop to send messages
+                for acr, n in zip(ac_rate, nsamp):
+                    msg = msg + f'{path}: :chart_with_upwards_trend: samples: {n}; :accept: avg. acpt rate: {acr} \n'
                     
                 slack_client.chat_postMessage(channel = channel, text = msg, mrkdwn = True, link_names = 1)
                 
