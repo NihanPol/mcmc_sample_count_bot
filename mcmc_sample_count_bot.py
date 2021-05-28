@@ -83,7 +83,7 @@ def get_all_chain_files(base_dir):
             if name.lower() in ['chain_1.txt', 'chain_1.0.txt']:
                 chain_files = np.append(chain_files, os.path.join(path, name))
                 
-    return chain_files
+    return sorted(chain_files)
 
 env_path = Path('.') / '.env'
 load_dotenv(env_path)
