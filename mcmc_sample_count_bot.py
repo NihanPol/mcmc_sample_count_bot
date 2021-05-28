@@ -35,7 +35,7 @@ def was_modified(fname, interval = 60 * 60):
     mod_time = statbuf.st_mtime
     current_time = time.time()
     
-    if np.abs(mod_time - current_time) <= interval:
+    if (np.abs(mod_time - current_time) <= interval) and statbuf.st_size > 0:
         return True
     else:
         return False
