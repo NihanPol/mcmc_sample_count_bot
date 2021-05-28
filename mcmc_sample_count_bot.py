@@ -147,14 +147,14 @@ if args.cronjob:
 
                 #nsamp = count_lines(path)
 
-                #fdata = pd.read_csv(path, sep='\t', dtype=float, header=None).values
+                fdata = pd.read_csv(path, sep='\t', dtype=float, header=None).values
 
-                #nsamp.append(fdata.shape[0])
+                nsamp.append(fdata.shape[0])
                 #ac_rate.append(np.round(np.mean(fdata[:, -2]), 3))
                 
                 # WGL removed requirement for pandas
-                with open(path) as f:
-                    nsamp.append(sum(1 for _ in f))
+                # with open(path) as f:
+                #   nsamp.append(sum(1 for _ in f))
                     
                 ac_rate.append(float(subprocess.check_output(['tail', '-1', path]).decode().split('\t')[-2]))
 
@@ -198,16 +198,16 @@ else:
 
                     #nsamp = count_lines(path)
 
-                #fdata = pd.read_csv(path, sep='\t', dtype=float, header=None).values
+                    fdata = pd.read_csv(path, sep='\t', dtype=float, header=None).values
 
-                #nsamp.append(fdata.shape[0])
-                #ac_rate.append(np.round(np.mean(fdata[:, -2]), 3))
-                
-                # WGL removed requirement for pandas
-                with open(path) as f:
-                    nsamp.append(sum(1 for _ in f))
-                    
-                ac_rate.append(float(subprocess.check_output(['tail', '-1', path]).decode().split('\t')[-2]))
+                    nsamp.append(fdata.shape[0])
+                    #ac_rate.append(np.round(np.mean(fdata[:, -2]), 3))
+
+                    # WGL removed requirement for pandas
+                    # with open(path) as f:
+                    #    nsamp.append(sum(1 for _ in f))
+
+                    ac_rate.append(float(subprocess.check_output(['tail', '-1', path]).decode().split('\t')[-2]))
                  
                 # WGL moved this block down from line below else statement
                 # WGL now message after data extracted
