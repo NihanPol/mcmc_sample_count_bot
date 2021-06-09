@@ -147,8 +147,11 @@ if args.cronjob:
 
                 #nsamp = count_lines(path)
 
-                fdata = pd.read_csv(path, sep='\t', dtype=float, header=None).values
-
+                try:
+                    fdata = pd.read_csv(path, sep='\t', dtype=float, header=None, error_bad_lines = False).values
+                except:
+                    nsamp.append(-1)
+                    continue
                 nsamp.append(fdata.shape[0])
                 #ac_rate.append(np.round(np.mean(fdata[:, -2]), 3))
                 
