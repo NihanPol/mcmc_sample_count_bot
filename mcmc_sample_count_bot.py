@@ -221,8 +221,11 @@ else:
                 
                 # WGL adding this loop to send messages
                 for acr, n, path in zip(ac_rate, nsamp, updated_chain_files):
-                    msg = msg + f'{path}: :chart_with_upwards_trend: samples: {n}; :accept: avg. acpt rate: {acr} \n'
                     
+                    if n != -1:
+                        msg = msg + f'{path}: :chart_with_upwards_trend: samples: {n}; :accept: avg. acpt rate: {acr} \n'
+                    else:
+                        msg = msg + f'{path}: could not open file with pandas! :warning:'
                 slack_client.chat_postMessage(channel = channel, text = msg, mrkdwn = True, link_names = 1)
                 
         if args.test:
