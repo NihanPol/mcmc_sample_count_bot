@@ -164,7 +164,7 @@ if args.cronjob:
 
             # WGL moved this block down from line below else statement
             # WGL now message after data extracted
-            init_msg = f':robot_face: <@{un}> has the following MCMC runs going:'
+            init_msg = f':robot_face: <@{un}> has the following {len(updated_chain_files)} MCMC runs going:'
             slack_client.chat_postMessage(channel = channel, text = init_msg)
 
             msg = ''
@@ -223,7 +223,7 @@ else:
                  
                 # WGL moved this block down from line below else statement
                 # WGL now message after data extracted
-                init_msg = f':robot_face: <@{un}> has the following MCMC runs going:'
+                init_msg = f':robot_face: <@{un}> has the following {len(updated_chain_files)} MCMC runs going:'
                 slack_client.chat_postMessage(channel = channel, text = init_msg)
 
                 msg = ''
