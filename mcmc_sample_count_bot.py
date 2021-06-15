@@ -147,8 +147,12 @@ if args.cronjob:
 
                 #nsamp = count_lines(path)
 
-                fdata = pd.read_csv(path, sep='\t', dtype=float, header=None).values
-
+                try:
+                    fdata = pd.read_csv(path, sep='\t', dtype=float, header=None, error_bad_lines = False).values
+                except:
+                    nsamp.append(-1)
+                    continue
+                    
                 nsamp.append(fdata.shape[0])
                 #ac_rate.append(np.round(np.mean(fdata[:, -2]), 3))
                 
@@ -167,7 +171,11 @@ if args.cronjob:
 
             # WGL adding this loop to send messages
             for acr, n, path in zip(ac_rate, nsamp, updated_chain_files):
-                msg = msg + f'{path}: :chart_with_upwards_trend: samples: {n}; :accept: avg. acpt rate: {acr} \n'
+                
+                if n != -1:
+                    msg = msg + f'{path}: :chart_with_upwards_trend: samples: {n}; :accept: avg. acpt rate: {acr} \n'
+                else:
+                    msg = msg + f'{path}: could not open file with pandas! :warning:'
                 
             slack_client.chat_postMessage(channel = channel, text = msg, mrkdwn = True, link_names = 1)
 
@@ -198,8 +206,12 @@ else:
 
                     #nsamp = count_lines(path)
 
-                    fdata = pd.read_csv(path, sep='\t', dtype=float, header=None).values
-
+                    try:
+                        fdata = pd.read_csv(path, sep='\t', dtype=float, header=None, error_bad_lines = False).values
+                    except:
+                        nsamp.append(-1)
+                        continue
+                    
                     nsamp.append(fdata.shape[0])
                     #ac_rate.append(np.round(np.mean(fdata[:, -2]), 3))
 
@@ -218,8 +230,12 @@ else:
                 
                 # WGL adding this loop to send messages
                 for acr, n, path in zip(ac_rate, nsamp, updated_chain_files):
-                    msg = msg + f'{path}: :chart_with_upwards_trend: samples: {n}; :accept: avg. acpt rate: {acr} \n'
                     
+                    if n != -1:
+                        msg = msg + f'{path}: :chart_with_upwards_trend: samples: {n}; :accept: avg. acpt rate: {acr} \n'
+                    else:
+                        msg = msg + f'{path}: could not open file with pandas! :warning:'
+                        
                 slack_client.chat_postMessage(channel = channel, text = msg, mrkdwn = True, link_names = 1)
                 
         if args.test:
