@@ -4,6 +4,7 @@ from pathlib import Path
 import time
 import argparse
 import subprocess
+from natsort import natsorted
 
 parser = argparse.ArgumentParser(description = "Setup slackbot to report number of samples in runs")
 
@@ -76,15 +77,15 @@ def get_all_chain_files(base_dir):
     chain_files: np.array; array containing paths to all chain_* files found.
     """
     
-    chain_files = np.array((), dtype = np.str)
+    chain_files = np.array([])
     
     for path, subdirs, files in os.walk(base_dir):
         
         for name in files:
-            if name.lower() in ['chain_1.txt', 'chain_1.0.txt']:
+            if name.lower() in ['chain_1.txt', 'chain_1.0.txt', 'chain.txt']:
                 chain_files = np.append(chain_files, os.path.join(path, name))
                 
-    return sorted(chain_files)
+    return natsorted(chain_files)
 
 env_path = Path('.') / '.env'
 load_dotenv(env_path)
@@ -128,7 +129,7 @@ if args.cronjob:
     
     for un, ubd in zip(user_id, user_base_dir):
 
-        chain_files = get_all_chain_files(np.str(ubd))
+        chain_files = get_all_chain_files(str(ubd))
 
         updated_chain_files = np.array(())
 
@@ -148,7 +149,8 @@ if args.cronjob:
                 #nsamp = count_lines(path)
 
                 try:
-                    fdata = pd.read_csv(path, sep='\t', dtype=float, header=None, error_bad_lines = False).values
+                    fdata = pd.read_csv(path, delim_whitespace=True,
+                                        dtype=float, header=None).values
                 except:
                     nsamp.append(-1)
                     continue
@@ -160,7 +162,7 @@ if args.cronjob:
                 # with open(path) as f:
                 #   nsamp.append(sum(1 for _ in f))
                     
-                ac_rate.append(float(subprocess.check_output(['tail', '-1', path]).decode().split('\t')[-2]))
+                ac_rate.append(float(subprocess.check_output(['tail', '-1', path]).decode().split()[-2]))
 
             # WGL moved this block down from line below else statement
             # WGL now message after data extracted
@@ -187,7 +189,7 @@ else:
 
         for un, ubd in zip(user_id, user_base_dir):
 
-            chain_files = get_all_chain_files(np.str(ubd))
+            chain_files = get_all_chain_files(str(ubd))
 
             updated_chain_files = np.array(())
 
@@ -207,7 +209,8 @@ else:
                     #nsamp = count_lines(path)
 
                     try:
-                        fdata = pd.read_csv(path, sep='\t', dtype=float, header=None, error_bad_lines = False).values
+                        fdata = pd.read_csv(path, dtype=float, header=None,
+                                            delim_whitespace=True).values
                     except:
                         nsamp.append(-1)
                         continue
@@ -219,7 +222,11 @@ else:
                     # with open(path) as f:
                     #    nsamp.append(sum(1 for _ in f))
 
-                    ac_rate.append(float(subprocess.check_output(['tail', '-1', path]).decode().split('\t')[-2]))
+                    try:
+                        ac_rate.append(float(subprocess.check_output(['tail', '-1', path]).decode().split()[-2]))
+                    except IndexError:
+                        ac_rate.append(np.nan)
+                        continue
                  
                 # WGL moved this block down from line below else statement
                 # WGL now message after data extracted
